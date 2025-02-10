@@ -3,6 +3,7 @@ name = "netcdf2dataframe"
 version = "0.1.1"
 description = "Small utility to transform netCDF files into (Geo)DataFrames"
 authors = ["Thomas Grandjean <thomas.grandjean@developpement-durable.gouv.fr>"]
+maintainers = ["Thomas Grandjean <thomas.grandjean@developpement-durable.gouv.fr>"]
 license = "GPL-3.0-or-later"
 readme = "README.md"
 homepage = "https://github.com/tgrandje/french-cities/"
