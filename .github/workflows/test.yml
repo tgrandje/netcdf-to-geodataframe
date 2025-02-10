@@ -1,11 +1,14 @@
 name: test
 
+
 on: 
   push:
     tags-ignore:
-      - v**
-  pull_request:
-    types: [opened, synchronize]
+      - '**'
+    branches:
+      - "main"
+      - "dev"
+
 
 jobs:
   test:

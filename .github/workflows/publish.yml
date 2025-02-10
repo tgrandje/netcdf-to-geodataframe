@@ -1,9 +1,9 @@
 name: publish
 
 on: 
-   push:
+  push:
     tags:
-      - v**
+      - '*'
 
 jobs:
   test:
@@ -43,7 +43,7 @@ jobs:
       #----------------------------------------------
       - name: Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        run: poetry install --no-interaction  --no-root --without dev
+        run: poetry install --no-interaction  --without dev
         
       #----------------------------------------------
       # add pytest, pytest-cov and cdsapi for tests (not the full dev dependencies to avoid installing spyder)
