@@ -33,8 +33,10 @@ netcdf2dataframe(path: str, target: str = 'pr', dropna: bool = True) -> geopanda
     ----------
     path : str
         Path to netCDF file
-    target : str, optional
-        Target variable. The default is "pr".
+    target : str
+        Target variable. Should be any of the available variables, excepting
+        the latitude, longitude or time. Please look the INFO log to now more
+        on the available variables.
         Note that available variables are displayed in the log (info level).
     dropna : bool, optional
         If True, the GeoDataFrame will not contain missing values, hence
@@ -62,11 +64,12 @@ netcdf2dataframe(path: str, target: str = 'pr', dropna: bool = True) -> geopanda
 ```
 
 ## Support
-
 In case of bugs, please open an issue [on the repo](https://github.com/tgrandje/netcdf-to-geodataframe/issues).
 
 ## Contribution
 Any help is welcome.
+
+This project is managed with poetry and tested with pytest. It uses black formatting with 79 characters.
 
 ## Author
 Thomas GRANDJEAN (DREAL Hauts-de-France, service Information, Développement Durable et Évaluation Environnementale, pôle Promotion de la Connaissance).

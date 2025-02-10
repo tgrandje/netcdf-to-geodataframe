@@ -1,17 +1,24 @@
 [tool.poetry]
 name = "netcdf2dataframe"
-version = "0.1.0"
-description = "Small utilities to transform netCDF files into (GeoDataFrames)"
+version = "0.1.1"
+description = "Small utility to transform netCDF files into (Geo)DataFrames"
 authors = ["Thomas Grandjean <thomas.grandjean@developpement-durable.gouv.fr>"]
+license = "GPL-3.0-or-later"
 readme = "README.md"
 homepage = "https://github.com/tgrandje/french-cities/"
 keywords = ["climatology", "oceanography"]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Topic :: Scientific/Engineering",
+    "Topic :: Education",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
 ]
+
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/tgrandje/netcdf-to-geodataframe/issues"
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -23,6 +30,8 @@ importlib-metadata = "^8.6.1"
 [tool.poetry.group.dev.dependencies]
 spyder = "^6.0.4"
 matplotlib = "^3.10.0"
+pytest = "^8.3.4"
+cdsapi = "^0.7.5"
 
 [build-system]
 requires = ["poetry-core"]

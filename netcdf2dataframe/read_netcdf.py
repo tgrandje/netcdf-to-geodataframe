@@ -36,8 +36,16 @@ class Dataset2DataFrame(Dataset):
     file to GeoDataFrames
     """
 
+    LATITUDE = "lat", "latitude"
+    LONGITUDE = "lon", "longitude"
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        for attribute in "description", "history", "source":
+            logger.info("%s: %s", attribute, self.get(attribute))
+        logger.info("variables: %s", self.variables.keys())
+
         self._parse_times()
         self._parse_coordinates()
 
@@ -118,8 +126,12 @@ class Dataset2DataFrame(Dataset):
          4     4 -177.749985
 
         """
-
-        lats = self.variables["lat"]
+        for var in self.LATITUDE:
+            try:
+                lats = self.variables[var]
+            except KeyError:
+                continue
+            break
         if lats.units not in {
             "degrees_north",
             "degree_north",
@@ -131,7 +143,13 @@ class Dataset2DataFrame(Dataset):
             raise ValueError(f"unexpected unit for latitudes: {lats.units}")
         lats = self.set_series_index(pd.Series(lats[:], name="lat_val"), "lat")
 
-        longs = self.variables["lon"]
+        for var in self.LONGITUDE:
+            try:
+                longs = self.variables[var]
+            except KeyError:
+                continue
+            break
+
         if longs.units not in {
             "degrees_east",
             "degree_east",
@@ -212,9 +230,8 @@ class Dataset2DataFrame(Dataset):
 
         return df
 
-    @staticmethod
     def _unstack_array(
-        variable: Variable, dropna: bool = True
+        self, variable: Variable, dropna: bool = True
     ) -> pd.DataFrame:
         """
         Inner function reshaping the 3D data to an unstacked DataFrame
@@ -253,15 +270,24 @@ class Dataset2DataFrame(Dataset):
         reshaped_values = data.reshape(-1, 1)
         reshaped_mask = data.mask.reshape(-1, 1)
 
-        df = pd.DataFrame(
-            np.hstack((reshaped_indices, reshaped_values, reshaped_mask)),
-            columns=["time", "lat", "long", "value", "mask"],
-        )
+        try:
+            variable.missing_value
+        except AttributeError:
+            logging.info("no missing value detected")
+            df = pd.DataFrame(
+                np.hstack((reshaped_indices, reshaped_values)),
+                columns=["time", "lat", "long", "value"],
+            )
+        else:
+            df = pd.DataFrame(
+                np.hstack((reshaped_indices, reshaped_values, reshaped_mask)),
+                columns=["time", "lat", "long", "value", "mask"],
+            )
 
-        if dropna:
-            ix = df[df["mask"] == 1].index
-            df = df.drop(ix)
-        df = df.drop("mask", axis=1)
+            if dropna:
+                ix = df[df["mask"] == 1].index
+                df = df.drop(ix)
+            df = df.drop("mask", axis=1)
 
         for f in ["time", "lat", "long"]:
             df[f] = df[f].astype(np.int32)
@@ -270,7 +296,7 @@ class Dataset2DataFrame(Dataset):
 
 
 def netcdf2dataframe(
-    path: str, target: str = "pr", dropna: bool = True
+    path: str, target: str, dropna: bool = True
 ) -> gpd.GeoDataFrame:
     """
     Picks a netCDF file and extracts one variable ("target") on the form of
@@ -280,8 +306,10 @@ def netcdf2dataframe(
     ----------
     path : str
         Path to netCDF file
-    target : str, optional
-        Target variable. The default is "pr".
+    target : str
+        Target variable. Should be any of the available variables, excepting
+        the latitude, longitude or time. Please look the INFO log to now more
+        on the available variables.
         Note that available variables are displayed in the log (info level).
     dropna : bool, optional
         If True, the GeoDataFrame will not contain missing values, hence
@@ -311,10 +339,6 @@ def netcdf2dataframe(
     """
 
     net = Dataset2DataFrame(path, "r", format="NETCDF4")
-
-    for attribute in "description", "history", "source":
-        logger.info("%s: %s", attribute, net.get(attribute))
-    logger.info("variables: %s", net.variables.keys())
     return net.to_dataframe(target, dropna)
 
 
