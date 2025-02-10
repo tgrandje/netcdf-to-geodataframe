@@ -43,19 +43,13 @@ jobs:
       #----------------------------------------------
       - name: Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        run: poetry install --no-interaction --without dev
+        run: poetry install --no-interaction  --no-root --without dev
         
       #----------------------------------------------
-      # add only pytest for tests (not the full dev dependencies to avoid installing spyder)
+      # add pytest, pytest-cov and cdsapi for tests (not the full dev dependencies to avoid installing spyder)
       #----------------------------------------------
-      - name: Add pytest
-        run: poetry run pip install pytest
-      
-      #----------------------------------------------
-      # add only pytest-cov for tests (not the full dev dependencies to avoid installing spyder)
-      #----------------------------------------------
-      - name: Add pytest-cov
-        run: poetry run pip install pytest-cov
+      - name: Add test dependencies
+        run: poetry run pip install pytest pytest-cov cdsapi
 
       #----------------------------------------------
       #              run test suite
@@ -68,7 +62,7 @@ jobs:
         
   publish:
     runs-on: ubuntu-latest
-    # needs: test
+    needs: test
     steps:
       #----------------------------------------------
       #       check-out repo and set-up python
@@ -104,7 +98,7 @@ jobs:
       #----------------------------------------------
       - name: Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        run: poetry install --no-interaction --no-root --without dev --extras "full"
+        run: poetry install --no-interaction --no-root --without dev
         
       #----------------------------------------------
       # install your root project, if required
